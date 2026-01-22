@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SIGNIN_ROUTE } from "@/lib/constants";
-import ShowcaseSection from "@/components/auth/ShowcaseSection";
-import AnimatedVoxioLogo from "@/components/AnimatedVoxioLogo/AnimatedVoxioLogo";
+import { AnimatedFoxyoLogo } from "@/components/AnimatedVoxioLogo/AnimatedVoxioLogo";
 import { SignUpEmailForm } from "@/components/auth/forms/SignUpEmailForm";
+import ShowcaseSection from "@/components/auth/ShowcaseSection";
 
 export const metadata: Metadata = {
   title: "Sign Up",
@@ -15,9 +15,9 @@ const SignUpPage = () => {
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-8 text-zinc-50 pt-20 pb-24">
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center">
-            <AnimatedVoxioLogo />
+            <AnimatedFoxyoLogo />
             <h1 className="md:text-3xl text-2xl text-center font-bold font-suse mb-8 text-app-primary">
-              Create an account at VOXIO
+              Create an account at Foxyo
             </h1>
           </div>
 

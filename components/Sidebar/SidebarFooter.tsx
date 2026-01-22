@@ -21,9 +21,9 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
-import { SETTINGS_ROUTE, USER_PROFILE_ROUTE } from "@/lib/constants";
-import Image from "next/image";
+import { SETTINGS_ROUTE, USER_ACCOUNT_ROUTE } from "@/lib/constants";
 import { getInitials } from "@/lib/helpers/getInitials";
+import Image from "next/image";
 
 export const SidebarFooterSection = async () => {
   const supabase = await createClient();
@@ -56,19 +56,25 @@ export const SidebarFooterSection = async () => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <Image
-                  src={profileData?.avatar_url || ""}
-                  alt={displayName}
-                  width={100}
-                  height={100}
-                />
-                {/* <AvatarImage
-                  src={profileData?.avatar_url || ""}
-                  alt={displayName}
-                /> */}
-                <AvatarFallback className="rounded-lg">
-                  {getInitials(displayName)}
-                </AvatarFallback>
+                {profileData?.avatar_url ? (
+                  // ✅ ROZWIĄZANIE: Użyj next/image bezpośrednio
+                  <div className="relative h-8 w-8 rounded-lg overflow-hidden">
+                    <Image
+                      src={profileData.avatar_url}
+                      alt={displayName}
+                      fill
+                      sizes="32px"
+                      className="object-cover"
+                      priority // ✅ Ładuj od razu, bez lazy loading
+                      unoptimized // ✅ Opcjonalnie: pomiń optymalizację Next.js (dla Supabase Storage)
+                    />
+                  </div>
+                ) : (
+                  // Fallback - pokaże inicjały gdy brak avatara
+                  <AvatarFallback className="rounded-lg bg-slate-700 text-slate-200">
+                    {getInitials(displayName)}
+                  </AvatarFallback>
+                )}
               </Avatar>
 
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
@@ -84,10 +90,10 @@ export const SidebarFooterSection = async () => {
             side="right"
             className="w-[--radix-popper-anchor-width] min-w-50 mb-2 ml-2 rounded-lg"
           >
-            <Link href={USER_PROFILE_ROUTE} className="flex-auto">
+            <Link href={USER_ACCOUNT_ROUTE} className="flex-auto">
               <DropdownMenuItem className="hover:cursor-pointer">
                 <CircleUserRound className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Account</span>
               </DropdownMenuItem>
             </Link>
             <SidebarSeparator />

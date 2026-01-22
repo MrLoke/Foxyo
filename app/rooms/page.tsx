@@ -51,7 +51,7 @@ const RoomsPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center">
+    <section className="min-h-screen w-full p-8 flex flex-col items-center">
       <Card className="w-full max-w-2xl mb-8">
         <CardHeader>
           <CardTitle>Create a new room</CardTitle>
@@ -79,7 +79,7 @@ const RoomsPage = () => {
           </Card>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

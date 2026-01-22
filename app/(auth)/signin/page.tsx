@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { SignInForm } from "@/components/auth/forms/SignInForm";
 import { RESET_PASSWORD_ROUTE, SIGNUP_ROUTE } from "@/lib/constants";
+import { AnimatedFoxyoLogo } from "@/components/AnimatedVoxioLogo/AnimatedVoxioLogo";
 import ShowcaseSection from "@/components/auth/ShowcaseSection";
-import AnimatedVoxioLogo from "@/components/AnimatedVoxioLogo/AnimatedVoxioLogo";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
 
 const SignInPage = async () => {
   return (
-    <div className="min-h-screen w-full flex overflow-y-auto bg-[radial-gradient(110%_110%_at_50%_10%,#cad5e2_40%,#E08116_100%)] dark:bg-[radial-gradient(110%_110%_at_50%_10%,#0f172b_40%,#E08116_100%)]">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-y-auto bg-[radial-gradient(110%_110%_at_50%_10%,#cad5e2_40%,#E08116_100%)] dark:bg-[radial-gradient(110%_110%_at_50%_10%,#0f172b_40%,#E08116_100%)]">
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-8 text-zinc-50 pt-20 pb-24">
         <div className="w-full max-w-sm">
           <div className="flex flex-col items-center">
-            <AnimatedVoxioLogo />
+            <AnimatedFoxyoLogo />
             <h1 className="md:text-3xl text-2xl text-center font-bold font-suse mb-8 text-app-primary">
-              Sign in to VOXIO
+              Sign in to Foxyo
             </h1>
           </div>
 
@@ -71,7 +71,7 @@ const SignInPage = async () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex lg:w-1/2 overflow-hidden">
+      <div className="flex lg:w-1/2 overflow-hidden">
         <ShowcaseSection />
       </div>
     </div>

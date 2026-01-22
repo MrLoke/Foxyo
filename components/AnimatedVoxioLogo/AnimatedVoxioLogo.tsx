@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const AnimatedVoxioLogo = () => {
+export const AnimatedFoxyoLogo = () => {
   return (
     <motion.svg
       width="150"
@@ -242,5 +242,3 @@ const AnimatedVoxioLogo = () => {
     </motion.svg>
   );
 };
-
-export default AnimatedVoxioLogo;

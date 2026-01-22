@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, SignInFormValues } from "@/lib/schemas/authSchema";
-import { signInAction } from "@/actions/auth";
+import { signInAction, signInWithGoogleAction } from "@/actions/auth";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { Mail, AlertCircleIcon } from "lucide-react";
 import { PasswordField } from "../ui/PasswordField";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FcGoogle } from "react-icons/fc";
 
 export const SignInForm = () => {
   const form = useForm<SignInFormValues>({
@@ -28,6 +29,21 @@ export const SignInForm = () => {
       password: "",
     },
   });
+
+  const handleGoogleLogin = async () => {
+    // Wywołujemy funkcję z Server Action. Cała logika OAuth (generowanie URL i redirect)
+    // została przeniesiona do pliku actions/auth.ts.
+    const result = await signInWithGoogleAction();
+
+    // Jeśli Server Action zwróci błąd (np. błąd połączenia z Supabase)
+    if (result && result.error) {
+      console.error("Błąd logowania przez Google:", result.error);
+      // toast({ title: "Błąd Google", description: result.error });
+      alert(`Błąd logowania przez Google: ${result.error}`);
+    }
+    // Jeśli Server Action jest udany, funkcja signInWithGoogleAction
+    // wykona za nas redirect() do Google.
+  };
 
   const onSubmit = async (values: SignInFormValues) => {
     const result = await signInAction(values);
@@ -60,7 +76,7 @@ export const SignInForm = () => {
                       type="email"
                       placeholder="E-mail address"
                       className={cn(
-                        "pl-10 text-slate-800 dark:text-slate-100",
+                        "pl-10 placeholder:text-sm md:placeholder:text-md text-slate-800 dark:text-slate-100",
                         {
                           "border-red-500": form.formState.errors.email,
                         }
@@ -101,6 +117,15 @@ export const SignInForm = () => {
             {form.formState.isSubmitting ? "Login..." : "Sign In"}
           </Button>
         </form>
+        <div className="flex items-center flex-col mt-4">
+          <h1 className="text-sm mb-2">Or continue with Google</h1>
+          <Button
+            className="w-full flex gap-2 bg-slate-100 text-slate-950 hover:bg-slate-200"
+            onClick={handleGoogleLogin}
+          >
+            <FcGoogle /> Sign in with Google
+          </Button>
+        </div>
       </Form>
     </div>
   );

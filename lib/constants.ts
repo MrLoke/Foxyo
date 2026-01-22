@@ -19,8 +19,10 @@ export const SIGNUP_ROUTE = "/signup";
 export const AUTH_CALLBACK_ROUTE = "/auth/callback";
 export const AUTH_ERROR_REDIRECT_PATH = "/auth/auth-code-error?error=";
 export const VERIFY_EMAIL_ROUTE = "/auth/verify-email";
+export const PRIVACY_POLICY_ROUTE = "/privacy-policy";
+export const TERMS_OF_SERVICE_ROUTE = "/terms-of-service";
 export const RESET_PASSWORD_ROUTE = "/reset-password";
-export const USER_PROFILE_ROUTE = "/profile";
+export const USER_ACCOUNT_ROUTE = "/account";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const MESSAGES_ROUTE = "/messages";
 export const ROOMS_LIST_ROUTE = "/rooms";
@@ -31,6 +33,8 @@ export const PUBLIC_ROUTES = [
   HOME_ROUTE,
   SIGNIN_ROUTE,
   SIGNUP_ROUTE,
+  PRIVACY_POLICY_ROUTE,
+  TERMS_OF_SERVICE_ROUTE,
   AUTH_CALLBACK_ROUTE,
   VERIFY_EMAIL_ROUTE,
 ];

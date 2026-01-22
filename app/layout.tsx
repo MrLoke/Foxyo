@@ -19,8 +19,8 @@ const suseSans = SUSE({
 });
 
 export const metadata: Metadata = {
-  title: "Voxio - Group Chat That's All Fun",
-  description: "Voxio the next level communicator platform.",
+  title: "Foxyo - Group Chat That's All Fun",
+  description: "Foxyo the next level communicator platform.",
 };
 
 const RootLayout = ({

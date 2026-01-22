@@ -5,7 +5,7 @@ type SvgProps = {
   height?: string | number;
 };
 
-export const VoxioLogo = ({ width = 55, height = 55 }: SvgProps) => {
+export const FoxyoLogo = ({ width = 55, height = 55 }: SvgProps) => {
   return (
     <svg
       width={width}
@@ -192,7 +192,7 @@ export const VoxioLogo = ({ width = 55, height = 55 }: SvgProps) => {
   );
 };
 
-export const VoxioTextLightLogo = ({ width = 150, height = 60 }: SvgProps) => {
+export const FoxyoTextLightLogo = ({ width = 150, height = 60 }: SvgProps) => {
   return (
     <svg
       width={width}
@@ -282,7 +282,7 @@ export const VoxioTextLightLogo = ({ width = 150, height = 60 }: SvgProps) => {
   );
 };
 
-export const VoxioTextDarkLogo = ({ width = 150, height = 60 }: SvgProps) => {
+export const FoxyoTextDarkLogo = ({ width = 150, height = 60 }: SvgProps) => {
   return (
     <svg
       width={width}

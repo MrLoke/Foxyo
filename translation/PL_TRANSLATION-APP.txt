@@ -35,20 +35,20 @@ Spróbuj ponownie
 
 Przenieś Rozmowę do Innego Wymiaru! 🦊
 
-VOXIO to innowacyjny komunikator stworzony do spontanicznych spotkań.
+Foxyo to innowacyjny komunikator stworzony do spontanicznych spotkań.
 
 ------page.tsx------
 
-Witaj w VOXIO
+Witaj w Foxyo
 
-VOXIO to nowoczesna platforma do czatowania oraz rozmów głosowych i wideo, 
+Foxyo to nowoczesna platforma do czatowania oraz rozmów głosowych i wideo, 
 zaprojektowana dla społeczności, zespołów i spontanicznych 
 spotkań. Dołączaj do wirtualnych pokojów, rozmawiaj bez zakłóceń i łącz 
 się z innymi — bez opóźnień i bez zbędnych komplikacji.
 
 Utwórz nowe konto
 
-Zaloguj się do VOXIO
+Zaloguj się do Foxyo
 
 ------GlobalNotFound.tsx------
 

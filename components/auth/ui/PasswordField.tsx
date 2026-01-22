@@ -46,9 +46,12 @@ export const PasswordField = <T extends FieldValues>({
                     ? "Confirm your password"
                     : "Enter your password"
                 }
-                className={cn("pl-10 text-slate-800 dark:text-slate-100", {
-                  "border-red-500": form.formState.errors.password,
-                })}
+                className={cn(
+                  "pl-10 placeholder:text-sm md:placeholder:text-md text-slate-800 dark:text-slate-100",
+                  {
+                    "border-red-500": form.formState.errors.password,
+                  }
+                )}
               />
               <button
                 type="button"

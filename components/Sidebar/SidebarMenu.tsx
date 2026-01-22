@@ -17,6 +17,7 @@ import {
 } from "react-icons/bi";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { IoAddCircle } from "react-icons/io5";
+import { MdAccountCircle } from "react-icons/md";
 import { Circle } from "../ui/circle";
 import {
   ROOMS_LIST_ROUTE,
@@ -24,6 +25,7 @@ import {
   MESSAGES_ROUTE,
   NOTIFICATIONS_ROUTE,
   SETTINGS_ROUTE,
+  USER_ACCOUNT_ROUTE,
 } from "@/lib/constants";
 
 export const SidebarMenuSection = () => {
@@ -46,6 +48,22 @@ export const SidebarMenuSection = () => {
                 </Circle>
                 <span className="group-data-[collapsible=icon]:hidden">
                   Dashboard
+                </span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <Link
+              href={USER_ACCOUNT_ROUTE}
+              className="flex justify-center font-medium"
+            >
+              <SidebarMenuButton tooltip="Dashboard" className={buttonClasses}>
+                <Circle>
+                  <MdAccountCircle className="h-5 w-5" />
+                </Circle>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Account
                 </span>
               </SidebarMenuButton>
             </Link>

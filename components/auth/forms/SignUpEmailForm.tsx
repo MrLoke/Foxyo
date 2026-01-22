@@ -95,7 +95,7 @@ export const SignUpEmailForm = () => {
   return (
     <div className="w-full max-w-md">
       {!showEmailForm && (
-        <>
+        <div className="flex mb-4">
           <Button
             onClick={() => setShowEmailForm(true)}
             className="w-full flex items-center bg-slate-100 text-slate-950 hover:bg-slate-200"
@@ -103,8 +103,8 @@ export const SignUpEmailForm = () => {
             <Mail className="text-slate-950" /> Sign up with e-mail
           </Button>
 
-          <Separator className="my-8 bg-slate-600 dark:bg-slate-600" />
-        </>
+          {/* <Separator className="my-8 bg-slate-600 dark:bg-slate-600" /> */}
+        </div>
       )}
 
       {showEmailForm ? (
@@ -124,7 +124,7 @@ export const SignUpEmailForm = () => {
                       type="email"
                       placeholder="E-mail"
                       className={cn(
-                        "pl-10 text-slate-800 dark:text-slate-100",
+                        "pl-10 placeholder:text-sm md:placeholder:text-md text-slate-800 dark:text-slate-100",
                         {
                           "border-red-500": form.formState.errors.email,
                         }
@@ -151,7 +151,7 @@ export const SignUpEmailForm = () => {
                       type="text"
                       placeholder="Your username"
                       className={cn(
-                        "pl-10 text-slate-800 dark:text-slate-100",
+                        "pl-10 placeholder:text-sm md:placeholder:text-md text-slate-800 dark:text-slate-100",
                         {
                           "border-red-500": form.formState.errors.username,
                         }
@@ -210,7 +210,7 @@ export const SignUpEmailForm = () => {
               className="w-full bg-slate-50 hover:bg-slate-50 dark:bg-slate-700 dark:hover:bg-slate-700 ring-2 ring-slate-400 dark:ring-slate-600 text-slate-700 dark:text-slate-200 transition-colors hover:cursor-pointer"
               onClick={() => setShowEmailForm(false)}
             >
-              Continue register with socials
+              Continue register with other methods
             </Button>
           </div>
         </Form>

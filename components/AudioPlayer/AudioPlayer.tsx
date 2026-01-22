@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 
-interface VoxioAudioPlayerProps {
+interface FoxyoAudioPlayerProps {
   src: string;
 }
 
@@ -13,7 +13,7 @@ const formatDuration = (seconds: number) => {
   return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 };
 
-export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
+export default function AudioPlayer({ src }: FoxyoAudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -53,6 +53,8 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
 
     const handleVolumeChange = () => {
       if (audio) {
+        setVolume(audio.volume);
+        setIsMuted(audio.muted);
       }
     };
 
@@ -111,7 +113,7 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
       <div className="flex items-center gap-3 w-full">
         <button
           onClick={togglePlay}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-[#5865F2] hover:bg-[#4752C4] text-white transition-colors shrink-0 shadow-sm"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-400 hover:bg-orange-500 text-white transition-colors shrink-0 shadow-sm"
         >
           {isPlaying ? (
             <Pause size={20} fill="currentColor" />
@@ -133,7 +135,7 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
                 key={index}
                 className={`flex-1 rounded-full transition-colors duration-100 ${
                   isPlayed
-                    ? "bg-[#5865F2]"
+                    ? "bg-orange-400"
                     : "bg-gray-400/50 dark:bg-gray-400/30"
                 }`}
                 style={{
@@ -145,7 +147,7 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
           })}
         </div>
 
-        <div className="text-xs font-mono text-gray-500 dark:text-gray-300 tabular-nums min-w-[35px] text-right">
+        <div className="text-xs font-mono text-orange-300 dark:text-orange-300 tabular-nums min-w-[35px] text-right">
           {isPlaying
             ? formatDuration(currentTime)
             : formatDuration(duration || 0)}
@@ -155,7 +157,7 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
       <div className="flex items-center gap-2 px-1 pt-1 border-t border-gray-200/50 dark:border-gray-700/50 mt-1">
         <button
           onClick={toggleMute}
-          className="text-gray-400 dark:text-gray-400 hover:text-[#5865F2] transition-colors"
+          className="text-orange-200 dark:text-orange-200 hover:text-orange-300 transition-colors"
           title={isMuted ? "Unmute" : "Mute"}
         >
           {isMuted || volume === 0 ? (
@@ -172,9 +174,9 @@ export default function VoxioAudioPlayer({ src }: VoxioAudioPlayerProps) {
           step="0.01"
           value={displayVolume}
           onChange={handleVolumeSliderChange}
-          className="w-full h-1.5 appearance-none rounded-full bg-gray-300 dark:bg-gray-600 focus:outline-none cursor-pointer"
+          className="w-full h-1.5 appearance-none rounded-full bg-orange-300 dark:bg-orange-500 focus:outline-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #5865F2 0%, #5865F2 ${
+            background: `linear-gradient(to right, #ff8904 0%, #ff8904 ${
               displayVolume * 100
             }%, rgb(156 163 175 / 0.3) ${
               displayVolume * 100

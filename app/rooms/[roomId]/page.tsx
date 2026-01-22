@@ -16,6 +16,7 @@ const RoomPage = async ({ params }: PageProps) => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) redirect(SIGNIN_ROUTE);
 
   const { data: currentUserProfile } = await supabase
@@ -49,20 +50,26 @@ const RoomPage = async ({ params }: PageProps) => {
     console.error("Error fetching messages:", messagesError);
   }
 
-  console.log("initialMessages", initialMessages);
-  console.log("profileData", profileData);
-  console.log("room", room);
-
   return (
-    <div className="h-screen min-w-2xl bg-slate-300 text-slate-900 dark:text-slate-100 dark:bg-slate-800 overflow-hidden">
-      <ChatRoom
-        userId={user.id}
-        currentUsername={profileData.username}
-        profileData={profileData}
-        roomId={roomId}
-        roomName={room.name}
-        initialMessages={initialMessages || []}
-      />
+    <div className="flex w-full h-full overflow-hidden">
+      <section className="flex-1 flex flex-col items-center justify-center bg-slate-950 relative border-r border-slate-800">
+        <div className="text-slate-500 text-center">
+          <h2 className="text-2xl font-bold">Stream Area</h2>
+          <p>Video player will be here</p>
+        </div>
+      </section>
+
+      {/* Stała szerokość: w-80 (320px) lub w-96 (384px) - jak na Twitchu */}
+      <aside className="w-80 xl:w-96 shrink-0 bg-slate-900 h-screen">
+        <ChatRoom
+          userId={user.id}
+          currentUsername={user.user_metadata.username}
+          profileData={profileData}
+          chatId={roomId}
+          chatType="room"
+          chatName={room.name}
+        />
+      </aside>
     </div>
   );
 };

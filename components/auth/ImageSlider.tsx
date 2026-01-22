@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Autoplay from "embla-carousel-autoplay";
-import { voxioAiImages } from "@/lib/mock-data";
+import { FoxyoAiImages } from "@/lib/mock-data";
 import {
   Carousel,
   CarouselContent,
@@ -28,7 +28,7 @@ export const ImageSlider: React.FC = () => {
       className="w-full h-full select-none hover:cursor-pointer"
     >
       <CarouselContent>
-        {voxioAiImages.map((item, index) => (
+        {FoxyoAiImages.map((item, index) => (
           <CarouselItem
             key={item.id}
             className="basis-[70%] md:basis-[70%] lg:basis-[70%]"
