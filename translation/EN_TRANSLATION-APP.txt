@@ -35,20 +35,20 @@ Try again
 
 Take Your Conversations to the Next Dimension! 🦊
 
-VOXIO is an innovative communicator designed for spontaneous meet-ups.
+Foxyo is an innovative communicator designed for spontaneous meet-ups.
 
 ------page.tsx------
 
-Welcome to VOXIO
+Welcome to Foxyo
 
-VOXIO is a modern platform for chatting and seamless voice & video conversations,
+Foxyo is a modern platform for chatting and seamless voice & video conversations,
 designed for communities, teams, and spontaneous meetups.
 Join virtual rooms, talk without interruptions, and connect with others —
 with no delays and no unnecessary complexity.
 
 Create new account
 
-Sign in to VOXIO
+Sign in to Foxyo
 
 ------GlobalNotFound.tsx------
 

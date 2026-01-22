@@ -9,7 +9,7 @@ const RoomsLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <Sidebar />
-      <main className="flex w-full flex-1 flex-col bg-slate-300 text-slate-900 dark:text-slate-100 dark:bg-slate-800">
+      <main className="flex flex-1 justify-between min-w-0 bg-slate-300 text-slate-900 dark:text-slate-100 dark:bg-slate-950 overflow-hidden">
         {children}
       </main>
     </SidebarProvider>

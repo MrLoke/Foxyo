@@ -20,53 +20,53 @@ interface MessageReactionsProps {
   onAddReaction: (messageId: number | string, emoji: string) => Promise<void>;
 }
 
-const generateTooltipText = (
-  reaction: Reaction,
-  userMap: UserMap,
-  currentUserId: string
-): string => {
-  const allUsernames = reaction.user_ids.map(
-    (id) => userMap[id] || "Unknown User"
-  );
+// const generateTooltipText = (
+//   reaction: Reaction,
+//   userMap: UserMap,
+//   currentUserId: string
+// ): string => {
+//   const allUsernames = reaction.user_ids.map(
+//     (id) => userMap[id] || "Unknown User"
+//   );
 
-  const reactedByMe = reaction.user_ids.includes(currentUserId);
+//   const reactedByMe = reaction.user_ids.includes(currentUserId);
 
-  const displayNames = allUsernames.filter((name, index) => {
-    if (name === "Unknown User") return false;
-    if (reactedByMe && reaction.user_ids[index] === currentUserId) return false;
-    return true;
-  });
+//   const displayNames = allUsernames.filter((name, index) => {
+//     if (name === "Unknown User") return false;
+//     if (reactedByMe && reaction.user_ids[index] === currentUserId) return false;
+//     return true;
+//   });
 
-  const totalOthersCount = displayNames.length;
-  const namesToShow = displayNames.slice(0, 2);
+//   const totalOthersCount = displayNames.length;
+//   const namesToShow = displayNames.slice(0, 2);
 
-  const parts: string[] = [];
+//   const parts: string[] = [];
 
-  if (reactedByMe) {
-    parts.push("Ty");
-  }
+//   if (reactedByMe) {
+//     parts.push("Ty");
+//   }
 
-  if (namesToShow.length > 0) {
-    parts.push(...namesToShow);
-  }
+//   if (namesToShow.length > 0) {
+//     parts.push(...namesToShow);
+//   }
 
-  const totalCount = reaction.user_ids.length;
-  const displayedCount = parts.length;
-  const remainder = totalCount - displayedCount;
+//   const totalCount = reaction.user_ids.length;
+//   const displayedCount = parts.length;
+//   const remainder = totalCount - displayedCount;
 
-  if (remainder > 0) {
-    if (displayedCount === 0) {
-      return `${totalCount} użytkowników`;
-    }
-    parts.push(`i ${remainder} innych`);
-  }
+//   if (remainder > 0) {
+//     if (displayedCount === 0) {
+//       return `${totalCount} użytkowników`;
+//     }
+//     parts.push(`i ${remainder} innych`);
+//   }
 
-  if (parts.length === 0) {
-    return "";
-  }
+//   if (parts.length === 0) {
+//     return "";
+//   }
 
-  return parts.join(", ");
-};
+//   return parts.join(", ");
+// };
 
 export const MessageReactions: React.FC<MessageReactionsProps> = ({
   messageId,
@@ -87,7 +87,7 @@ export const MessageReactions: React.FC<MessageReactionsProps> = ({
     currentUserId: string
   ): string => {
     const usernames = reaction.user_ids
-      .map((id) => userMap[id] || "Nieznany Użytkownik")
+      .map((id) => userMap?.[id] ?? "Nieznany Użytkownik")
       .filter((name) => name !== "Nieznany Użytkownik");
 
     const count = usernames.length;

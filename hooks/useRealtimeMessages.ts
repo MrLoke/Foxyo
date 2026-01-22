@@ -1,13 +1,15 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   SupabaseClient,
   RealtimeChannel,
   RealtimePostgresChangesPayload,
 } from "@supabase/supabase-js";
-import type { Message } from "./useMessagesQuery";
 import { createClient } from "@/lib/supabase/client";
+import type { UniversalMessage } from "./useChatMessages";
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 type UserProfile = {
   id: string;
@@ -15,29 +17,51 @@ type UserProfile = {
   avatar_url: string | null;
 };
 
-export type EnrichedMessage = Message & {
+export type EnrichedMessage = UniversalMessage & {
   users?: UserProfile | null;
   replied_to_message?: {
     username: string;
     content: string;
     attachment_url: string | null;
+    user_id: string;
   } | null;
   client_id?: string | null;
 };
 
+type ChatType = "room" | "direct";
+type OnMessageFn = (m: EnrichedMessage) => void;
+
+interface UseRealtimeMessagesProps {
+  chatId: string; // room_id lub conversation_id
+  chatType: ChatType;
+  currentUsername: string;
+  currentUserId: string;
+  onNewMessage: OnMessageFn;
+  onUpdateMessage: OnMessageFn;
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
 const TYPING_TIMEOUT = 3500;
 const supabase: SupabaseClient = createClient();
 
-type OnMessageFn = (m: EnrichedMessage) => void;
+// ============================================================================
+// HOOK
+// ============================================================================
 
-export const useRealtimeMessages = (
-  roomId: string,
-  currentUsername: string,
-  onNewMessage: OnMessageFn,
-  onUpdateMessage: OnMessageFn
-) => {
+export const useRealtimeMessages = ({
+  chatId,
+  chatType,
+  currentUsername,
+  currentUserId,
+  onNewMessage,
+  onUpdateMessage,
+}: UseRealtimeMessagesProps) => {
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const currentRoomRef = useRef<string | null>(null);
+  const currentChatRef = useRef<string | null>(null);
+  const currentChatTypeRef = useRef<ChatType | null>(null);
 
   const onNewMessageRef = useRef<OnMessageFn>(onNewMessage);
   const onUpdateMessageRef = useRef<OnMessageFn>(onUpdateMessage);
@@ -45,10 +69,14 @@ export const useRealtimeMessages = (
   const authTokenRef = useRef<string | null>(null);
 
   const [typingUsersMap, setTypingUsersMap] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [sessionLoaded, setSessionLoaded] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+
+  // ============================================================================
+  // UPDATE REFS - zawsze aktualne callbacki
+  // ============================================================================
 
   useEffect(() => {
     onNewMessageRef.current = onNewMessage;
@@ -57,6 +85,10 @@ export const useRealtimeMessages = (
   useEffect(() => {
     onUpdateMessageRef.current = onUpdateMessage;
   }, [onUpdateMessage]);
+
+  // ============================================================================
+  // LOAD SESSION - pobierz token autoryzacji
+  // ============================================================================
 
   useEffect(() => {
     let mounted = true;
@@ -76,25 +108,40 @@ export const useRealtimeMessages = (
     };
   }, []);
 
+  // ============================================================================
+  // ENRICH MESSAGE - dodaj dane użytkownika i odpowiedzi
+  // ============================================================================
+
   const enrichMessage = useCallback(
-    async (raw: Message): Promise<EnrichedMessage> => {
+    async (raw: any, messageType: ChatType): Promise<EnrichedMessage> => {
       try {
+        // Unifikacja - w direct_messages mamy sender_id zamiast user_id
+        const userId = messageType === "direct" ? raw.sender_id : raw.user_id;
+
         let userPromise = Promise.resolve({ data: null, error: null } as any);
 
-        if (raw.user_id) {
+        if (userId) {
           userPromise = supabase
             .from("users")
             .select("id, username, avatar_url")
-            .eq("id", raw.user_id)
+            .eq("id", userId)
             .single();
         }
 
         let replyPromise = Promise.resolve({ data: null, error: null } as any);
 
         if (raw.replied_to_id) {
+          const replyTable =
+            messageType === "room" ? "messages" : "direct_messages";
+
+          const selectColumns =
+            messageType === "room"
+              ? "username, content, attachment_url, user_id" // messages - tylko user_id
+              : "username, content, attachment_url, sender_id"; // direct_messages - tylko sender_id
+
           replyPromise = supabase
-            .from("messages")
-            .select("username, content, attachment_url")
+            .from(replyTable)
+            .select(selectColumns)
             .eq("id", raw.replied_to_id)
             .single();
         }
@@ -121,11 +168,16 @@ export const useRealtimeMessages = (
                 username: replyResult.data.username || "Unknown",
                 content: replyResult.data.content || "",
                 attachment_url: replyResult.data.attachment_url || null,
+                // ✅ POPRAWKA: Pobierz prawidłową kolumnę
+                user_id:
+                  replyResult.data.user_id || replyResult.data.sender_id || "",
               }
             : null;
 
         return {
           ...raw,
+          user_id: userId,
+          username: users.username || raw.username || "Unknown",
           users,
           replied_to_message: repliedToMessage,
         } as EnrichedMessage;
@@ -133,33 +185,46 @@ export const useRealtimeMessages = (
         console.error("Error enriching message:", err);
         return {
           ...raw,
+          user_id: raw.user_id || raw.sender_id,
           users: { username: raw.username || "Unknown", avatar_url: null },
           replied_to_message: null,
         } as EnrichedMessage;
       }
     },
-    []
+    [],
   );
+
+  // ============================================================================
+  // HANDLE INSERT PAYLOAD
+  // ============================================================================
 
   const handleInsertPayload = useCallback(
-    async (payload: RealtimePostgresChangesPayload<Message> | null) => {
+    async (payload: RealtimePostgresChangesPayload<any> | null) => {
       if (!payload || !payload.new) return;
-      const raw = payload.new as Message;
-      const enriched = await enrichMessage(raw);
+      const raw = payload.new;
+      const enriched = await enrichMessage(raw, chatType);
       onNewMessageRef.current(enriched);
     },
-    [enrichMessage]
+    [enrichMessage, chatType],
   );
 
+  // ============================================================================
+  // HANDLE UPDATE PAYLOAD
+  // ============================================================================
+
   const handleUpdatePayload = useCallback(
-    async (payload: RealtimePostgresChangesPayload<Message> | null) => {
+    async (payload: RealtimePostgresChangesPayload<any> | null) => {
       if (!payload || !payload.new) return;
-      const raw = payload.new as Message;
-      const enriched = await enrichMessage(raw);
+      const raw = payload.new;
+      const enriched = await enrichMessage(raw, chatType);
       onUpdateMessageRef.current(enriched);
     },
-    [enrichMessage]
+    [enrichMessage, chatType],
   );
+
+  // ============================================================================
+  // TYPING CLEANUP - usuń użytkowników, którzy nie piszą > TYPING_TIMEOUT
+  // ============================================================================
 
   useEffect(() => {
     if (Object.keys(typingUsersMap).length === 0) return;
@@ -179,13 +244,23 @@ export const useRealtimeMessages = (
     return () => clearInterval(interval);
   }, [typingUsersMap]);
 
-  useEffect(() => {
-    if (!sessionLoaded || !roomId) return;
+  // ============================================================================
+  // REALTIME SUBSCRIPTION - główna logika subskrypcji
+  // ============================================================================
 
-    if (channelRef.current && currentRoomRef.current === roomId) {
+  useEffect(() => {
+    if (!sessionLoaded || !chatId) return;
+
+    // Jeśli channel już istnieje dla tego samego chatu, nie twórz nowego
+    if (
+      channelRef.current &&
+      currentChatRef.current === chatId &&
+      currentChatTypeRef.current === chatType
+    ) {
       return;
     }
 
+    // Cleanup poprzedniego channelu
     if (channelRef.current) {
       try {
         supabase.removeChannel(channelRef.current);
@@ -193,10 +268,12 @@ export const useRealtimeMessages = (
         /* ignore */
       }
       channelRef.current = null;
-      currentRoomRef.current = null;
+      currentChatRef.current = null;
+      currentChatTypeRef.current = null;
       queueMicrotask(() => setIsSubscribed(false));
     }
 
+    // Utwórz opcje channelu z autoryzacją
     const options =
       authTokenRef.current != null
         ? {
@@ -207,56 +284,109 @@ export const useRealtimeMessages = (
           }
         : undefined;
 
-    const ch = supabase.channel(`room_messages:${roomId}`, options);
+    // Nazwa channelu i tabela zależą od typu chatu
+    const channelName =
+      chatType === "room"
+        ? `room_messages:${chatId}`
+        : `direct_messages:${chatId}`;
 
-    ch.on(
-      "postgres_changes",
-      {
+    const tableName = chatType === "room" ? "messages" : "direct_messages";
+
+    const ch = supabase.channel(channelName, options);
+
+    // ============================================================================
+    // POSTGRES CHANGES - INSERT
+    // ============================================================================
+
+    let filterConfig: any = {};
+
+    if (chatType === "room") {
+      filterConfig = {
         event: "INSERT",
         schema: "public",
-        table: "messages",
-        filter: `room_id=eq.${roomId}`,
-      },
-      (payload: RealtimePostgresChangesPayload<Message>) => {
-        void handleInsertPayload(payload);
-      }
-    )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "messages",
-          filter: `room_id=eq.${roomId}`,
-        },
-        (payload: RealtimePostgresChangesPayload<Message>) => {
-          void handleUpdatePayload(payload);
-        }
-      )
-      .on("broadcast", { event: "typing" }, (incoming) => {
-        try {
-          const payload = incoming.payload ?? incoming;
-          const user = payload?.user as string | undefined;
-          const isTyping = Boolean(
-            payload?.isTyping ?? payload?.is_typing ?? payload?.isTyping
-          );
-          if (!user || user === currentUsername) return;
-          setTypingUsersMap((prev) => {
-            const copy = { ...prev };
-            if (isTyping) copy[user] = Date.now();
-            else delete copy[user];
-            return copy;
-          });
-        } catch {}
-      })
-      .subscribe((status) => {
-        const s = String(status);
-        const subscribed = s === "SUBSCRIBED" || s === "CHANNEL_JOINED";
-        setIsSubscribed(subscribed);
-      });
+        table: tableName,
+        filter: `room_id=eq.${chatId}`,
+      };
+    } else {
+      // Dla DM - musimy filtrować po conversation_id (jeśli masz takie pole)
+      // LUB po parze sender_id/receiver_id
+      // Zakładam, że masz conversation_id w direct_messages
+      filterConfig = {
+        // event: "INSERT",
+        // schema: "public",
+        // table: tableName,
+        // Jeśli nie masz conversation_id, możesz filtrować po obu użytkownikach
+        // W tym przypadku możesz nie używać filtra i sprawdzać po stronie klienta
+        event: "INSERT",
+        schema: "public",
+        table: "direct_messages",
+        filter: `conversation_id=eq.${chatId}`,
+      };
+    }
+
+    ch.on("postgres_changes", filterConfig, (payload: any) => {
+      void handleInsertPayload(payload);
+    });
+
+    // ============================================================================
+    // POSTGRES CHANGES - UPDATE
+    // ============================================================================
+
+    let updateFilterConfig: any = {};
+
+    if (chatType === "room") {
+      updateFilterConfig = {
+        event: "UPDATE",
+        schema: "public",
+        table: tableName,
+        filter: `room_id=eq.${chatId}`,
+      };
+    } else {
+      updateFilterConfig = {
+        event: "UPDATE",
+        schema: "public",
+        table: tableName,
+      };
+    }
+
+    ch.on("postgres_changes", updateFilterConfig, (payload: any) => {
+      void handleUpdatePayload(payload);
+    });
+
+    // ============================================================================
+    // BROADCAST - TYPING
+    // ============================================================================
+
+    ch.on("broadcast", { event: "typing" }, (incoming) => {
+      try {
+        const payload = incoming.payload ?? incoming;
+        const user = payload?.user as string | undefined;
+        const isTyping = Boolean(
+          payload?.isTyping ?? payload?.is_typing ?? payload?.isTyping,
+        );
+        if (!user || user === currentUsername) return;
+        setTypingUsersMap((prev) => {
+          const copy = { ...prev };
+          if (isTyping) copy[user] = Date.now();
+          else delete copy[user];
+          return copy;
+        });
+      } catch {}
+    });
+
+    // ============================================================================
+    // SUBSCRIBE
+    // ============================================================================
+
+    ch.subscribe((status) => {
+      const s = String(status);
+      const subscribed = s === "SUBSCRIBED" || s === "CHANNEL_JOINED";
+      setIsSubscribed(subscribed);
+    });
 
     channelRef.current = ch;
-    currentRoomRef.current = roomId;
+    currentChatRef.current = chatId;
+    currentChatTypeRef.current = chatType;
 
     return () => {
       if (channelRef.current) {
@@ -266,17 +396,23 @@ export const useRealtimeMessages = (
           /* ignore */
         }
         channelRef.current = null;
-        currentRoomRef.current = null;
+        currentChatRef.current = null;
+        currentChatTypeRef.current = null;
         setIsSubscribed(false);
       }
     };
   }, [
-    roomId,
+    chatId,
+    chatType,
     sessionLoaded,
     currentUsername,
     handleInsertPayload,
     handleUpdatePayload,
   ]);
+
+  // ============================================================================
+  // SEND TYPING EVENT
+  // ============================================================================
 
   const sendTypingEvent = useCallback(
     (isTyping: boolean) => {
@@ -304,15 +440,15 @@ export const useRealtimeMessages = (
         console.warn("Failed to send typing event", err);
       }
     },
-    [currentUsername, isSubscribed]
+    [currentUsername, isSubscribed],
   );
 
-  const typingUsers = Object.keys(typingUsersMap).filter(
-    (u) => u !== currentUsername
-  );
+  // ============================================================================
+  // RECONNECT
+  // ============================================================================
 
   const reconnect = useCallback(() => {
-    if (!currentRoomRef.current) return;
+    if (!currentChatRef.current) return;
     if (channelRef.current) {
       try {
         supabase.removeChannel(channelRef.current);
@@ -323,6 +459,18 @@ export const useRealtimeMessages = (
       setIsSubscribed(false);
     }
   }, []);
+
+  // ============================================================================
+  // TYPING USERS - lista użytkowników piszących (bez nas)
+  // ============================================================================
+
+  const typingUsers = Object.keys(typingUsersMap).filter(
+    (u) => u !== currentUsername,
+  );
+
+  // ============================================================================
+  // RETURN
+  // ============================================================================
 
   return {
     typingUsers,

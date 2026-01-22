@@ -26,6 +26,17 @@ export const signInSchema = z.object({
 
 export type SignInFormValues = z.infer<typeof signInSchema>;
 
+export const signInWithMagicLinkSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "E-mail address is required." })
+    .pipe(z.email({ message: "Invalid e-mail address format." })),
+});
+
+export type SignInWithMagicLinkFormValues = z.infer<
+  typeof signInWithMagicLinkSchema
+>;
+
 export const signUpSchema = z
   .object({
     email: z

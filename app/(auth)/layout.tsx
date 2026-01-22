@@ -6,10 +6,10 @@ import { CircleArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | VOXIO",
-    default: "Authentication VOXIO",
+    template: "%s | Foxyo",
+    default: "Authentication Foxyo",
   },
-  description: "Log in or register to join VOXIO.",
+  description: "Log in or register to join Foxyo.",
 };
 
 export default function AuthLayout({

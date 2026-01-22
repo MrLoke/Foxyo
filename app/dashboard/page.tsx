@@ -34,7 +34,9 @@ const DashboardPage = async () => {
         <strong>Welcome!</strong>
         <br />
         Jesteś zalogowany jako:
-        <strong>{user.user_metadata?.username || user.email}</strong>
+        <strong>
+          {user.user_metadata?.username || user.user_metadata?.full_name}
+        </strong>
         <strong>{user?.email}</strong>
       </div>
 

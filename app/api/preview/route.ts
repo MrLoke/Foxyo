@@ -45,7 +45,8 @@ function detectProvider(url: string) {
     if (host.includes("youtube.com") || host.includes("youtu.be"))
       return "youtube";
     if (host.includes("tiktok.com")) return "tiktok";
-    if (host.includes("open.spotify.com")) return "spotify";
+    if (host.includes("spotify.com")) return "spotify";
+    // if (host.includes("open.spotify.com")) return "spotify";
     if (host.includes("soundcloud.com")) return "soundcloud";
     if (host.includes("twitter.com") || host.includes("x.com"))
       return "twitter";
@@ -58,7 +59,7 @@ function detectProvider(url: string) {
 
 async function fetchOEmbed(oembedUrl: string) {
   const res = await fetch(oembedUrl, {
-    headers: { "User-Agent": "VoxioPreview/1.0 (+https://example.com)" },
+    headers: { "User-Agent": "FoxyoPreview/1.0 (+https://example.com)" },
     // timeout not available in fetch in some runtimes; keep request short server-side
   });
   if (!res.ok) throw new Error(`oembed ${res.status}`);
@@ -155,7 +156,6 @@ export async function GET(req: NextRequest) {
           provider: "spotify",
           url,
           title: json?.title,
-          description: json?.author_name ? `${json.author_name}` : undefined,
           images: json?.thumbnail_url ? [json.thumbnail_url] : [],
           html: json?.html,
           mediaType: "audio",
@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
           // Simple meta fetch (lightweight): fetch first 100KB
           const res = await fetch(url, {
             method: "GET",
-            headers: { "User-Agent": "VoxioPreview/1.0" },
+            headers: { "User-Agent": "FoxyoPreview/1.0" },
           });
           const txt = await res.text();
           // quick og:title img extraction (na poziomie regex; not perfect but works often)
